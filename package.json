@@ -1,0 +1,17 @@
+{
+  "name": "scripts",
+  "version": "1.0.0",
+  "description": "Utilitary scripts",
+  "main": "slugify.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "keywords": [
+    "TakeShape"
+  ],
+  "author": "Eduardo Oviedo",
+  "license": "ISC",
+  "dependencies": {
+    "isomorphic-fetch": "^3.0.0"
+  }
+}
