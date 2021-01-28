@@ -1,7 +1,7 @@
 {
-  "name": "scripts",
+  "name": "slug-field-migration",
   "version": "1.0.0",
-  "description": "Utilitary scripts",
+  "description": "Utility script",
   "main": "slugify.js",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1"
@@ -12,6 +12,5 @@
   "author": "Eduardo Oviedo",
   "license": "ISC",
   "dependencies": {
-    "isomorphic-fetch": "^3.0.0"
   }
 }
