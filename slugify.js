@@ -1,4 +1,5 @@
 require('isomorphic-fetch');
+const slug = require('slugg');
 
 const tsProjectId = process.env.TS_PROJECT_ID;
 const tsApiKey = process.env.TS_API_KEY;
@@ -10,13 +11,11 @@ const endpoint = `https://api.takeshape.io/project/${tsProjectId}/graphql`
 
 const slugify = async () => {
   console.log('loading...');
-  const data = await getShapeList();
-  const items = data[`get${shape}List`].items;
+  const items = await getShapeList();
 
   if (items.length > 0) {
     console.log('updating...');
-    const data = await updateShapes(items);
-    const list = Object.values(data);
+    const list = await updateShapes(items);
     list.forEach(update => {
       const result = update.result;
       console.log(`-> ${origin}: ${result[origin]} -> ${target}: ${result[target]}`);
@@ -28,26 +27,34 @@ const slugify = async () => {
   }
 };
 
-const getShapeList = async () => await tsFetch(`
-  query {
-    get${shape}List (where: {NOT: {${target}: {regexp: ".+"}}}, size: 10) {
-      items {
-        _id
-        ${origin}
+const getShapeList = async () => {
+  const data = await tsFetch(`
+    query {
+      get${shape}List (where: {NOT: {${target}: {regexp: ".+"}}}, size: 10) {
+        items {
+          _id
+          ${origin}
+        }
       }
-    }
-  }`
-);
+    }`
+  );
+
+  if (!data) {
+    console.log('Could not get the Shape data. Make sure the Slug field exist.');
+    return;
+  }
+
+  const items = data[`get${shape}List`].items;
+  return items;
+};
 
 const updateShapes = async (items) => {
-  let id;
-  let slug;
   let update = '';
   items.forEach((property, i) => {
-    id = property._id;
-    slug = textToSlug(property[origin]);
+    const id = property._id;
+    const slug_text = slug(property[origin]);
     update += `
-      update${i}: update${shape}(input: {_id: "${id}", ${target}: "${slug}"}) {
+      update${i}: update${shape}(input: {_id: "${id}", ${target}: "${slug_text}"}) {
         result {
           _id
           ${origin}
@@ -57,22 +64,14 @@ const updateShapes = async (items) => {
     `
   });
 
-  return await tsFetch(`
+  const data = await tsFetch(`
     mutation {
       ${update}
     }
   `);
+  const list = Object.values(data);
+  return list;
 };
-
-const textToSlug = text => text
-  .toString()
-  .normalize('NFD')
-  .replace(/[\u0300-\u036f]/g, '')
-  .toLowerCase()
-  .trim()
-  .replace(/\s+/g, '-')
-  .replace(/[^\w-]+/g, '')
-  .replace(/--+/g, '-');
 
 const tsFetch = async (query) => {
   response = await fetch(endpoint, {

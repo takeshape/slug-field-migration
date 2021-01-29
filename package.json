@@ -12,6 +12,7 @@
   "author": "Eduardo Oviedo",
   "license": "ISC",
   "dependencies": {
-    "isomorphic-fetch": "^3.0.0"
+    "isomorphic-fetch": "^3.0.0",
+    "slugg": "^1.1.0"
   }
 }
