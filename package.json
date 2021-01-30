@@ -13,6 +13,7 @@
   "license": "ISC",
   "dependencies": {
     "isomorphic-fetch": "^3.0.0",
+    "p-queue": "^6.6.2",
     "slugg": "^1.1.0"
   }
 }
