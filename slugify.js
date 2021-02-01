@@ -12,25 +12,27 @@ const concurrency = 10;
 
 const endpoint = `https://api.takeshape.io/project/${tsProjectId}/graphql`
 const queue = new PQueue({concurrency});
+const records = [];
 
 let from = 0;
 
 const slugify = async () => {
-  console.log('loading more records...');
+  console.log('loading records...');
   const items = await getShapeList();
 
   if (items.length > 0) {
-    console.log('updating more records...');
-    queue.add(async () => {
+    records.push(items);
+    slugify();
+  } else {
+    console.log('done loading...');
+    console.log('updating records...');
+    records.forEach(items => queue.add(async () => {
       const list = await updateShapes(items);
       list.forEach(update => {
         const result = update.result;
         console.log(`-> ${origin}: ${result[origin]} -> ${target}: ${result[target]}`);
       });
-    });
-    slugify();
-  } else {
-    console.log('done loading...');
+    }));
   }
 };
 
